@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: screener_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: screener
+    ports:
+      - "5433:5432"
