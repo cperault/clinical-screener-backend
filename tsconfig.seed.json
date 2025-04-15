@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["db/seed.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "outDir": "dist/seed",
+    "rootDir": ".",
+    "noEmit": false,
+    "lib": ["es2017", "dom"],
+    "types": ["node"],
+    "module": "commonjs",
+    "esModuleInterop": true
+  }
+}
