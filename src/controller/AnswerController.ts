@@ -28,39 +28,35 @@ export class AnswerController {
 
   async createAnswersWithSubmission(req: Request, res: Response): Promise<void> {
     try {
-      const { session_id, clinician_notes, answers } = req.body;
+      const { session_id, answers } = req.body;
 
-      const result = await this.answerService.processScreenerSubmission(
-        session_id,
-        answers,
-        clinician_notes
-      );
+      const result = await this.answerService.processScreenerSubmission(session_id, answers);
 
       res.status(201).json({
         message: "Screener processed successfully",
-        ...result
+        ...result,
       });
     } catch (error: unknown) {
       console.error("Detailed error in createAnswersWithSubmission:", {
         error,
         message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
 
       if (error instanceof ValidationError) {
         res.status(400).json({
           error: error.code,
-          message: error.message
+          message: error.message,
         });
       } else if (error instanceof DatabaseError) {
         res.status(500).json({
           error: error.code,
-          message: error.message
+          message: error.message,
         });
       } else {
         res.status(500).json({
           error: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred while processing the screener"
+          message: "An unexpected error occurred while processing the screener",
         });
       }
     }

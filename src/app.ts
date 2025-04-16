@@ -15,6 +15,11 @@ import { config } from "./config";
 
 const app = express();
 
+// Trust the proxy in production (needed for Heroku)
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(helmet());
 
 const limiter = rateLimit({
@@ -26,11 +31,13 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(express.json());
+
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://clinical-screener-frontend.netlify.app"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "x-correlation-id"],
+    credentials: true,
   })
 );
 
@@ -48,13 +55,13 @@ app.use((req, res, next) => {
 
 const pool = new Pool({
   connectionString: config.databaseURL,
-  ssl: config.nodeEnv === "production" ? { rejectUnauthorized: false } : false,
 });
+
 const database = new Database(pool);
 const questionService = new QuestionService(database);
 const scoringService = new ScoringService(database);
 const answerService = new AnswerService(database, scoringService, questionService);
-const screenerService = new ScreenerService(database);
+const screenerService = new ScreenerService();
 
 const apiRouter = new ApiRouter(questionService, answerService, screenerService);
 app.use("/api", apiRouter.getRouter());

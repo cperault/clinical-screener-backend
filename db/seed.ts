@@ -31,8 +31,7 @@ async function seedDatabase() {
       CREATE TABLE IF NOT EXISTS submissions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         session_id TEXT NOT NULL UNIQUE,
-        created_at TIMESTAMP DEFAULT NOW(),
-        clinician_notes TEXT
+        created_at TIMESTAMP DEFAULT NOW()
       );
 
       CREATE TABLE IF NOT EXISTS answers (

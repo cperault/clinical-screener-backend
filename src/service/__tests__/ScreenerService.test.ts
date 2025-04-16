@@ -36,7 +36,7 @@ describe("ScreenerService", () => {
     // Mock path.join
     (path.join as jest.Mock).mockReturnValue("/mock/path/screener.json");
 
-    screenerService = new ScreenerService(mockDatabase);
+    screenerService = new ScreenerService();
   });
 
   describe("getScreener", () => {

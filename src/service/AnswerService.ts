@@ -8,7 +8,6 @@ export interface Submission {
   id: string;
   session_id: string;
   created_at: string;
-  clinician_notes?: string;
 }
 
 interface Answer {
@@ -41,14 +40,14 @@ export class AnswerService {
     return result;
   }
 
-  async createSubmission(sessionId: string, clinicianNotes?: string): Promise<Submission> {
+  async createSubmission(sessionId: string): Promise<Submission> {
     const result = await this.database.query<Submission>(
       `
-      INSERT INTO submissions (session_id, clinician_notes)
-      VALUES ($1, $2)
+      INSERT INTO submissions (session_id)
+      VALUES ($1)
       RETURNING *
     `,
-      [sessionId, clinicianNotes ?? null]
+      [sessionId]
     );
     return result[0];
   }
@@ -80,11 +79,7 @@ export class AnswerService {
     }
   }
 
-  async processScreenerSubmission(
-    sessionId: string,
-    answers: Array<{ question_id: string; value: number }>,
-    clinicianNotes?: string
-  ) {
+  async processScreenerSubmission(sessionId: string, answers: Array<{ question_id: string; value: number }>) {
     if (!sessionId) {
       throw new ValidationError("Missing session_id");
     }
@@ -119,10 +114,9 @@ export class AnswerService {
         );
       }
 
-      const submissionResult = await client.query(
-        "INSERT INTO submissions (session_id, clinician_notes) VALUES ($1, $2) RETURNING id",
-        [sessionId, clinicianNotes]
-      );
+      const submissionResult = await client.query("INSERT INTO submissions (session_id) VALUES ($1) RETURNING id", [
+        sessionId,
+      ]);
       const submissionId = submissionResult.rows[0].id;
 
       for (const answer of answers) {
